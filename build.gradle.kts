@@ -1,10 +1,13 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 plugins {
     id("java")
+    id("com.gradleup.shadow") version "8.3.0"
 }
 
 group = "io.github.sinhajun"
 version = "0.0.1"
-val main = "io.github.sinhajun.plugin"
+val main = "${group}.plugin"
 
 repositories {
     mavenCentral()
@@ -29,8 +32,32 @@ tasks {
             )
         }
     }
+
+    shadowJar {
+        archiveVersion.set("")
+        archiveClassifier.set("")
+
+        doLast {
+            copy {
+                val pluginFile = rootProject.file(".server/plugins/")
+                if (pluginFile.exists()) {
+                    from(archiveFile)
+                    into(pluginFile)
+                } else {
+                    println("open server, command : ./run")
+                }
+            }
+        }
+    }
+
     test {
         useJUnitPlatform()
+    }
+}
+
+tasks {
+    build {
+        dependsOn(shadowJar)
     }
 }
 
