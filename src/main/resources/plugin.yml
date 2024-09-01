@@ -1,0 +1,4 @@
+main: ${main}.Plugin
+name: $name
+version: $version
+api-version: '1.20'

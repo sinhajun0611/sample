@@ -3,7 +3,8 @@ plugins {
 }
 
 group = "io.github.sinhajun"
-version = "1.0-SNAPSHOT"
+version = "0.0.1"
+val main = "io.github.sinhajun.plugin"
 
 repositories {
     mavenCentral()
@@ -18,8 +19,19 @@ dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
 }
 
-tasks.test {
-    useJUnitPlatform()
+tasks {
+    processResources {
+        filesMatching("plugin.yml") {
+            expand(
+                "main" to main,
+                "name" to rootProject.name,
+                "version" to version
+            )
+        }
+    }
+    test {
+        useJUnitPlatform()
+    }
 }
 
 java {
