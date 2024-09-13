@@ -1,20 +1,15 @@
-#!/bin/sh
-# https://api.papermc.io/v2/projects/paper/versions/1.21.1/builds/57/downloads/paper-1.21.1-57.jar
-argument=$1
+#!/bin/bash
+
+DIR=".server"
 VERSION=$(curl -s https://api.papermc.io/v2/projects/paper | \
     jq -r '.versions[-1]')
-BUILD=$(curl -s https://api.papermc.io/v2/projects/paper/versions/${VERSION}/builds | \
-    jq '.builds | map(select(.channel == "default") | .build) | .[-1]')
-FILE_URL=https://api.papermc.io/v2/projects/paper/versions/${VERSION}/builds/${BUILD}/downloads/paper-${VERSION}-${BUILD}.jar
-DIR=".server"
+EULA="eula.txt"
+JAR_NAME="paper.jar"
+# Get latest build number
+BUILD_NUMBER_LATEST=$(curl -s "https://api.papermc.io/v2/projects/paper/versions/${VERSION}/builds" | jq -r '.builds | last | .build')
+BUILD_NUMBER="${2:-${BUILD_NUMBER_LATEST}}"
+URL="https://api.papermc.io/v2/projects/paper/versions/${VERSION}/builds/${BUILD_NUMBER}/downloads/paper-${VERSION}-${BUILD_NUMBER}.jar"
 
-if [ ${argument} == "start" ]; then
-  if [ ! -d $DIR ]; then
-      mkdir $DIR
-  fi
-
-elif [ ${argument} == "version" ]; then
-    echo "version"
-else
-  echo "사용법"
-fi
+mkdir -p "$DIR" && cd "$_" || exit
+wget "$URL" -O "$JAR_NAME" && echo "eula=true" > "$EULA"
+java -jar "$JAR_NAME"
